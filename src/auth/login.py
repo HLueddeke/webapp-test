@@ -17,24 +17,48 @@ def authenticate_user(username, password):
     Returns:
         dict: Authentication result with token if successful
     """
+    # UPDATED: Added input validation for security
+    if not username or not password:
+        return {
+            'success': False,
+            'error': 'Username and password are required'
+        }
+    
+    # UPDATED: Added username length validation
+    if len(username.strip()) < 3:
+        return {
+            'success': False,
+            'error': 'Username must be at least 3 characters'
+        }
+    
     # Hash the password
     password_hash = hashlib.sha256(password.encode()).hexdigest()
+    
+    # UPDATED: Added authentication attempt logging
+    print(f"Authentication attempt for user: {username}")
     
     # Check against database (simulated)
     if validate_credentials(username, password_hash):
         # Generate JWT token
         token = generate_jwt_token(username)
+        
+        # UPDATED: Added success logging
+        print(f"Successful authentication for user: {username}")
+        
         return {
             'success': True,
             'token': token,
-            'expires': datetime.now() + timedelta(hours=24)
+            'expires': datetime.now() + timedelta(hours=24),
+            'user': username  # UPDATED: Added username to response
         }
     else:
+        # UPDATED: Added failed attempt logging
+        print(f"Failed authentication attempt for user: {username}")
+        
         return {
             'success': False,
             'error': 'Invalid credentials'
         }
-
 def validate_credentials(username, password_hash):
     """
     Validate user credentials against database
